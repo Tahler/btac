@@ -9,7 +9,13 @@ _HOST = 'https://www.jhavalanche.org'
 
 def main():
   urls = _fetch_event_urls()
-  fatalities = [_extract_fatality(url) for url in urls[-2:]]
+  fatalities = []
+  for url in urls:
+    try:
+      f = _extract_fatality(url)
+      fatalities.append(f)
+    except Exception as e:
+      print(f'Could not extract fatality information from {url}: {e}')
   # GeoJSON specifies points in longitude, latitude order.
   positions = [(f.longitude, f.latitude) for f in fatalities]
   export.to_geojson('out.json', positions)
@@ -34,10 +40,10 @@ def _extract_fatality(url):
   # Selects the first of two columns.
   container = soup.select_one('.cell.medium-auto')
   inner_html = container.decode_contents()
-  datetime = _DATETIME_PATTERN.search(inner_html).group(1)
+  # datetime = _DATETIME_PATTERN.search(inner_html).group(1)
   latitude = _LATITUDE_PATTERN.search(inner_html).group(1)
   longitude = _LONGITUDE_PATTERN.search(inner_html).group(1)
-  return btac.Fatality(datetime, float(latitude), float(longitude))
+  return btac.Fatality('', float(latitude), float(longitude))
 
 
 if __name__ == "__main__":
