@@ -1,6 +1,7 @@
 import re
 
 import btac
+import export
 import scrape
 
 _HOST = 'https://www.jhavalanche.org'
@@ -8,8 +9,10 @@ _HOST = 'https://www.jhavalanche.org'
 
 def main():
   urls = _fetch_event_urls()
-  events = [_extract_fatality(url) for url in urls[-2:]]
-  print(events)
+  fatalities = [_extract_fatality(url) for url in urls[-2:]]
+  # GeoJSON specifies points in longitude, latitude order.
+  positions = [(f.longitude, f.latitude) for f in fatalities]
+  export.to_geojson('out.json', positions)
 
 
 def _fetch_event_urls():
@@ -34,7 +37,7 @@ def _extract_fatality(url):
   datetime = _DATETIME_PATTERN.search(inner_html).group(1)
   latitude = _LATITUDE_PATTERN.search(inner_html).group(1)
   longitude = _LONGITUDE_PATTERN.search(inner_html).group(1)
-  return btac.Fatality(datetime, latitude, longitude)
+  return btac.Fatality(datetime, float(latitude), float(longitude))
 
 
 if __name__ == "__main__":
