@@ -17,8 +17,7 @@ def main():
     except Exception as e:
       print(f'Could not extract fatality information from {url}: {e}')
   # GeoJSON specifies points in longitude, latitude order.
-  positions = [(f.longitude, f.latitude) for f in fatalities]
-  export.to_geojson('out.json', positions)
+  export.to_geojson('out.json', fatalities)
 
 
 def _fetch_event_urls():
