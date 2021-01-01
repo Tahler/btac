@@ -49,7 +49,12 @@ def _extract_table(table_soup: bs4.BeautifulSoup,
   header = [th.get_text() for th in thead.select('th')]
   rows = []
   tr = thead.next_sibling
-  while tr.name == 'tr':
+  while True:
+    if tr.name != 'tr':
+      break
+    tds = tr.select('td')
+    if len(tds) != len(header):
+      break
     row = FatalityRow(header, tr)
     if row.date >= _EARLIEST_FORECAST_DATE:
       rows.append(row)
@@ -62,8 +67,8 @@ _EARLIEST_FORECAST_DATE = datetime.date(1999, 11, 29)
 
 class FatalityRow:
 
-  def __init__(self, header: List[str], tr: bs4.BeautifulSoup):
-    for (key, td) in zip(header, tr.select('td')):
+  def __init__(self, header: List[str], tds: List[bs4.BeautifulSoup]):
+    for (key, td) in zip(header, tds):
       if key == 'Date':
         value = td.get_text().strip()
         self.date = _parse_date(value)
