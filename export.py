@@ -28,6 +28,7 @@ def to_geojson(out_path, fatalities):
                             'title': f.date.isoformat(),
                             'description': '\n'.join(description_lines),
                             'marker-color': hex_color,
+                            'marker-symbol': 'danger',
                         })
     features.append(f)
   feature_collection = geojson.FeatureCollection(features)
