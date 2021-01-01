@@ -14,8 +14,8 @@ def to_geojson(out_path, fatalities):
 
   def _gradient(date: datetime.date) -> str:
     since_earliest = (date - earliest).days
-    red_ratio = math.floor(since_earliest / num_days)
-    r_value = math.floor(red_ratio * 255)
+    red_ratio = since_earliest / num_days
+    r_value = math.floor(red_ratio * 127) + 128
     return '#%02x%02x%02x' % (r_value, 0, 0)
 
   for f in fatalities:
