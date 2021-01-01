@@ -24,7 +24,7 @@ def to_geojson(out_path, fatalities):
     hex_color = _gradient(f.date)
     f = geojson.Feature(geometry=geojson.Point((f.longitude, f.latitude)),
                         properties={
-                            'title': f.datetime,
+                            'title': f.date.isoformat(),
                             'description': '\n'.join(description_lines),
                             'marker-color': hex_color,
                         })
