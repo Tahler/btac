@@ -66,12 +66,11 @@ class FatalityRow:
       if key == 'Date':
         value = td.get_text().strip()
         self.date = _parse_date(value)
+        self.forecast_url = _format_forecast_url(self.date)
       elif key == 'Name':
         a = td.find('a')
         path = a['href']
         self.event_url = f'{_HOST}/{path}'
-    if date >= _EARLIEST_FORECAST_DATE:
-      self.forecast_url = _format_forecast_url(date)
 
 
 def _parse_date(s: str) -> datetime.date:
@@ -85,6 +84,8 @@ def _parse_date(s: str) -> datetime.date:
 
 
 def _format_forecast_url(date: datetime.date) -> str:
+  if date < _EARLIEST_FORECAST_DATE:
+    return None
   query_string = f'?data_date={date.isoformat()}&template=teton_print.tpl.php'
   return f'{_HOST}/viewTeton{query_string}'
 
@@ -104,13 +105,17 @@ def _extract_fatality(url):
   date = _parse_date(raw_datetime)
   latitude = _LATITUDE_PATTERN.search(inner_html).group(1)
   longitude = _LONGITUDE_PATTERN.search(inner_html).group(1)
-  return Fatality(date, float(latitude), float(longitude))
+  forecast_url = _format_forecast_url(date)
+  return Fatality(date, float(latitude), float(longitude), url, forecast_url)
 
 
 class Fatality:
 
   # TODO: Add other fields, including the number of people caught and/or killed.
-  def __init__(self, date: datetime.date, latitude: float, longitude: float):
+  def __init__(self, date: datetime.date, latitude: float, longitude: float,
+               event_url: str, forecast_url: str):
     self.date = date
     self.latitude = latitude
     self.longitude = longitude
+    self.event_url = event_url
+    self.forecast_url = forecast_url
