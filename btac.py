@@ -77,7 +77,7 @@ class FatalityRow:
 def _parse_date(s: str) -> datetime.date:
   for format in ['%Y', '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%Y %H:%M:%S']:
     try:
-      dt = datetime.datetime.strptime(raw_date, format)
+      dt = datetime.datetime.strptime(s, format)
       return dt.date()
     except ValueError:
       continue
