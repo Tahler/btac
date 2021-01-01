@@ -20,6 +20,7 @@ def fetch_fatalities():
       fatalities.append(f)
     except Exception as e:
       print(f'Could not extract fatality information from {url}: {e}')
+  return fatalities
 
 
 def _fetch_event_urls():
