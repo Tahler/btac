@@ -75,7 +75,7 @@ class FatalityRow:
 
 
 def _parse_date(s: str) -> datetime.date:
-  for format in ['%Y', '%Y-%m-%d']:
+  for format in ['%Y', '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%Y %H:%M:%S']:
     try:
       dt = datetime.datetime.strptime(raw_date, format)
       return dt.date()
@@ -100,16 +100,17 @@ def _extract_fatality(url):
   # Selects the first of two columns.
   container = soup.select_one('.cell.medium-auto')
   inner_html = container.decode_contents()
-  datetime = _DATETIME_PATTERN.search(inner_html).group(1)
+  raw_datetime = _DATETIME_PATTERN.search(inner_html).group(1)
+  date = _parse_date(raw_datetime)
   latitude = _LATITUDE_PATTERN.search(inner_html).group(1)
   longitude = _LONGITUDE_PATTERN.search(inner_html).group(1)
-  return Fatality(datetime, float(latitude), float(longitude))
+  return Fatality(date, float(latitude), float(longitude))
 
 
 class Fatality:
 
   # TODO: Add other fields, including the number of people caught and/or killed.
-  def __init__(self, datetime: str, latitude: float, longitude: float):
-    self.datetime = datetime
+  def __init__(self, date: datetime.date, latitude: float, longitude: float):
+    self.date = date
     self.latitude = latitude
     self.longitude = longitude
